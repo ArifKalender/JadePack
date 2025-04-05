@@ -1,0 +1,24 @@
+Abilities:
+  EarthQuake:
+    Enabled: true
+    RequireSneak: true
+    AllowDifferentSlots: false
+    UserMustBeInRadius: false
+    Cooldown: 8000
+    Duration: 5000
+    Radius: 3.5
+    DamageInterval: 650
+    Damage: 1.0
+  RockBullets:
+    Enabled: true
+    Cooldown: 12000
+    Duration: 3000
+    Interval: 333
+    Damage: 1.0
+Strings:
+  EarthQuake:
+    Description: 'EarthQuake lets the user shake the earth beneath them in a set radius, damaging the entities inside.'
+    Instructions: 'Right click on a block while sneaking.'
+  RockBullets:
+    Description: ''
+    Instructions: ''
