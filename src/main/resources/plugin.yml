@@ -1,0 +1,4 @@
+name: JadePack
+version: '1.0'
+main: me.Kugelbltz.jadePack.JadePack
+api-version: '1.20'
