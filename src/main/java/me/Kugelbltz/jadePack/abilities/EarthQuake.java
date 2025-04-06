@@ -1,12 +1,25 @@
 package me.Kugelbltz.jadePack.abilities;
 
+import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.attribute.Attribute;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
+import com.projectkorra.projectkorra.util.DamageHandler;
+import com.projectkorra.projectkorra.util.ParticleEffect;
+import com.projectkorra.projectkorra.util.TempBlock;
+import com.projectkorra.projectkorra.util.TempFallingBlock;
+import me.Kugelbltz.jadePack.JadePack;
+import me.Kugelbltz.jadePack.Util;
+import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.entity.*;
+import org.bukkit.util.Vector;
 
-import static com.projectkorra.projectkorra.ProjectKorra.plugin;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import static me.Kugelbltz.jadePack.JadePack.plugin;
 import static me.Kugelbltz.jadePack.JadePack.earthQuakeDescription;
 import static me.Kugelbltz.jadePack.JadePack.earthQuakeInstructions;
 
@@ -23,25 +36,32 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
     long damageInterval;
     @Attribute(Attribute.DAMAGE)
     double damage;
+    long tempDamageInterval;
 
     private Location location;
+    int i = 0;
+
     public EarthQuake(Player player) {
         super(player);
+        setFields();
         if (bPlayer.canBend(this) && !hasAbility(player, this.getClass())) {
-            location=player.getLocation();
-            start();
+            if (player.isOnGround()) {
+                location = player.getLocation();
+                location.getWorld().playSound(location, Sound.ITEM_MACE_SMASH_GROUND_HEAVY, 3, 0);
+                start();
+            }
         }
     }
 
-    private void setFields(){
-        cooldown=plugin.getConfig().getLong("Abilities.EarthQuake.Cooldown");
-        duration=plugin.getConfig().getLong("Abilities.EarthQuake.Duration");
-        radius=plugin.getConfig().getDouble("Abilities.EarthQuake.Radius");
-        damageInterval=plugin.getConfig().getLong("Abilities.EarthQuake.DamageInterval");
-        damage=plugin.getConfig().getDouble("Abilities.EarthQuake.Damage");
-        requireSneak=plugin.getConfig().getBoolean("Abilities.EarthQuake.RequireSneak");
-        allowDifferentSlots=plugin.getConfig().getBoolean("Abilities.EarthQuake.AllowDifferentSlots");
-        userMustBeInRadius=plugin.getConfig().getBoolean("Abilities.EarthQuake.UserMustBeInRadius");
+    private void setFields() {
+        cooldown = plugin.getConfig().getLong("Abilities.EarthQuake.Cooldown");
+        duration = plugin.getConfig().getLong("Abilities.EarthQuake.Duration");
+        radius = plugin.getConfig().getDouble("Abilities.EarthQuake.Radius");
+        damageInterval = plugin.getConfig().getLong("Abilities.EarthQuake.DamageInterval");
+        damage = plugin.getConfig().getDouble("Abilities.EarthQuake.Damage");
+        requireSneak = plugin.getConfig().getBoolean("Abilities.EarthQuake.RequireSneak");
+        allowDifferentSlots = plugin.getConfig().getBoolean("Abilities.EarthQuake.AllowDifferentSlots");
+        userMustBeInRadius = plugin.getConfig().getBoolean("Abilities.EarthQuake.UserMustBeInRadius");
 
     }
 
@@ -61,8 +81,63 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
         return earthQuakeInstructions;
     }
 
+    private void removeAbility() {
+        remove();
+        bPlayer.addCooldown(this);
+    }
+
+    //List<BlockDisplay> displayList = new ArrayList<BlockDisplay>();
+
     @Override
     public void progress() {
+        i++;
+        //player.sendMessage("sa");
+        if (!bPlayer.canBend(this) || player.isDead() || !player.isOnline() || getStartTime() + duration < System.currentTimeMillis()) {
+            removeAbility();
+            return;
+        }
+        if (requireSneak && !player.isSneaking()) {
+            removeAbility();
+            return;
+        }
+        if (!allowDifferentSlots) {
+            if (!bPlayer.getBoundAbilityName().equalsIgnoreCase(getName())) {
+                removeAbility();
+                return;
+            }
+        }
+        if (userMustBeInRadius) {
+            if (player.getLocation().distance(location) > radius) {
+                removeAbility();
+                return;
+            }
+        }
+
+        for (Entity entity : GeneralMethods.getEntitiesAroundPoint(location, radius)) {
+            if (entity instanceof LivingEntity && entity != player) {
+                if (Math.round((float) damageInterval / 50) == 0) {
+                    DamageHandler.damageEntity(entity, damage, this);
+                    ((LivingEntity) entity).setNoDamageTicks(0);
+                } else if (i % (Math.round((float) (damageInterval / 50))) == 0) {
+                    DamageHandler.damageEntity(entity, damage, this);
+                    ((LivingEntity) entity).setNoDamageTicks(0);
+                }
+            }
+        }
+
+        for (Block block : Util.getBlocksBelow(radius, location)) {
+            if (this.isEarthbendable(block)) {
+                if (new Random().nextDouble(0, 1) < 0.005) {
+                    new TempFallingBlock(new Location(block.getWorld(), block.getX(), block.getY() + 1, block.getZ()), block.getType().createBlockData(), new Vector(0, 0.3, 0), this);
+                } else if (new Random().nextDouble(0, 1) < 0.5) {
+                    block.getWorld().spawnParticle(Particle.BLOCK_CRUMBLE, block.getLocation(), 15, 0.5, 0.5, 0.5, 0, block.getBlockData());
+                }
+
+            }
+        }
+        //playEarthbendingSound(location);
+
+
     }
 
     @Override
@@ -87,7 +162,7 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
 
     @Override
     public org.bukkit.Location getLocation() {
-        return null;
+        return location;
     }
 
     @Override
@@ -102,11 +177,11 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
 
     @Override
     public String getAuthor() {
-        return "";
+        return "Kugelbltz";
     }
 
     @Override
     public String getVersion() {
-        return "";
+        return JadePack.version;
     }
 }
