@@ -5,7 +5,6 @@ import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.util.DamageHandler;
-import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.util.TempBlock;
 import com.projectkorra.projectkorra.util.TempFallingBlock;
 import me.Kugelbltz.jadePack.JadePack;
@@ -15,8 +14,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import static me.Kugelbltz.jadePack.JadePack.plugin;
@@ -32,11 +29,10 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
     long duration;
     @Attribute(Attribute.RADIUS)
     double radius;
-    @Attribute("DamageInterval")
+    @Attribute("Interval")
     long damageInterval;
     @Attribute(Attribute.DAMAGE)
     double damage;
-    long tempDamageInterval;
 
     private Location location;
     int i = 0;
@@ -86,13 +82,11 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
         bPlayer.addCooldown(this);
     }
 
-    //List<BlockDisplay> displayList = new ArrayList<BlockDisplay>();
 
     @Override
     public void progress() {
         i++;
-        //player.sendMessage("sa");
-        if (!bPlayer.canBend(this) || player.isDead() || !player.isOnline() || getStartTime() + duration < System.currentTimeMillis()) {
+        if (!bPlayer.canBendIgnoreBinds(this) || player.isDead() || !player.isOnline() || getStartTime() + duration < System.currentTimeMillis()) {
             removeAbility();
             return;
         }
@@ -100,7 +94,7 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
             removeAbility();
             return;
         }
-        if (!allowDifferentSlots) {
+       if (!allowDifferentSlots) {
             if (!bPlayer.getBoundAbilityName().equalsIgnoreCase(getName())) {
                 removeAbility();
                 return;
@@ -129,20 +123,24 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
             if (this.isEarthbendable(block)) {
                 if (new Random().nextDouble(0, 1) < 0.005) {
                     new TempFallingBlock(new Location(block.getWorld(), block.getX(), block.getY() + 1, block.getZ()), block.getType().createBlockData(), new Vector(0, 0.3, 0), this);
+                    if(block.getLocation().distance(player.getLocation())>1.5){
+                        new TempBlock(block, Material.AIR.createBlockData(),500, this);
+                    }
+                    location.getWorld().playSound(location, Sound.BLOCK_ANCIENT_DEBRIS_BREAK, 1, 0);
                 } else if (new Random().nextDouble(0, 1) < 0.5) {
                     block.getWorld().spawnParticle(Particle.BLOCK_CRUMBLE, block.getLocation(), 15, 0.5, 0.5, 0.5, 0, block.getBlockData());
                 }
 
             }
         }
-        //playEarthbendingSound(location);
+
 
 
     }
 
     @Override
     public boolean isSneakAbility() {
-        return false;
+        return true;
     }
 
     @Override
@@ -161,7 +159,7 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
     }
 
     @Override
-    public org.bukkit.Location getLocation() {
+    public Location getLocation() {
         return location;
     }
 
