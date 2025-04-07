@@ -46,6 +46,7 @@ public class RockBullets extends EarthAbility  implements AddonAbility {
         }
     }
 
+
     @Override
     public boolean isEnabled() {
         return plugin.getConfig().getBoolean("Abilities.RockBullets.Enabled");

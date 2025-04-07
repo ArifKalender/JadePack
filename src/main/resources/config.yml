@@ -1,14 +1,20 @@
 Abilities:
   EarthQuake:
     Enabled: true
-    RequireSneak: true
-    AllowDifferentSlots: false
-    UserMustBeInRadius: false
     Cooldown: 8000
     Duration: 5000
     Radius: 3.5
     DamageInterval: 650
     Damage: 1.0
+    Slowness:
+      Enabled: true
+      Potency: 1
+    RemovalPolicy:
+      RequireSneak: true
+      AllowDifferentSlots: false
+      UserMustBeInRadius: true
+      EnforceGroundDirection: true
+      MaximumPitchDifference: 45.0
   RockBullets:
     Enabled: true
     Cooldown: 12000

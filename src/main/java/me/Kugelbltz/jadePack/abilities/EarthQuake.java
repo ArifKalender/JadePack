@@ -12,6 +12,8 @@ import me.Kugelbltz.jadePack.Util;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Random;
@@ -33,6 +35,10 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
     long damageInterval;
     @Attribute(Attribute.DAMAGE)
     double damage;
+    private boolean enforceGroundDirection;
+    private float maxPitchDifference;
+    boolean slownessEnabled;
+    int slownessPotency;
 
     private Location location;
     int i = 0;
@@ -42,9 +48,20 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
         setFields();
         if (bPlayer.canBend(this) && !hasAbility(player, this.getClass())) {
             if (player.isOnGround()) {
-                location = player.getLocation();
-                location.getWorld().playSound(location, Sound.ITEM_MACE_SMASH_GROUND_HEAVY, 3, 0);
-                start();
+                if((!this.isEarthbendable(new Location(player.getLocation().getWorld(),player.getLocation().getX(),player.getLocation().getY()-1,player.getLocation().getZ()).getBlock()))){
+                    return;
+                }
+                if(enforceGroundDirection){
+                    if(Math.abs(player.getEyeLocation().getPitch() - 90) <= maxPitchDifference){
+                        location = player.getLocation();
+                        location.getWorld().playSound(location, Sound.ITEM_MACE_SMASH_GROUND_HEAVY, 3, 0);
+                        start();
+                    }
+                }else{
+                    location = player.getLocation();
+                    location.getWorld().playSound(location, Sound.ITEM_MACE_SMASH_GROUND_HEAVY, 3, 0);
+                    start();
+                }
             }
         }
     }
@@ -55,10 +72,13 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
         radius = plugin.getConfig().getDouble("Abilities.EarthQuake.Radius");
         damageInterval = plugin.getConfig().getLong("Abilities.EarthQuake.DamageInterval");
         damage = plugin.getConfig().getDouble("Abilities.EarthQuake.Damage");
-        requireSneak = plugin.getConfig().getBoolean("Abilities.EarthQuake.RequireSneak");
-        allowDifferentSlots = plugin.getConfig().getBoolean("Abilities.EarthQuake.AllowDifferentSlots");
-        userMustBeInRadius = plugin.getConfig().getBoolean("Abilities.EarthQuake.UserMustBeInRadius");
-
+        requireSneak = plugin.getConfig().getBoolean("Abilities.EarthQuake.RemovalPolicy.RequireSneak");
+        allowDifferentSlots = plugin.getConfig().getBoolean("Abilities.EarthQuake.RemovalPolicy.AllowDifferentSlots");
+        userMustBeInRadius = plugin.getConfig().getBoolean("Abilities.EarthQuake.RemovalPolicy.UserMustBeInRadius");
+        enforceGroundDirection = plugin.getConfig().getBoolean("Abilities.EarthQuake.RemovalPolicy.EnforceGroundDirection");
+        maxPitchDifference = (float) plugin.getConfig().getDouble("Abilities.EarthQuake.RemovalPolicy.MaxPitchDifference");
+        slownessEnabled = plugin.getConfig().getBoolean("Abilities.EarthQuake.Slowness.Enabled");
+        slownessPotency = plugin.getConfig().getInt("Abilities.EarthQuake.Slowness.Potency");
     }
 
 
@@ -94,6 +114,12 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
             removeAbility();
             return;
         }
+        if(enforceGroundDirection){
+            if(Math.abs(player.getEyeLocation().getPitch() - 90) > maxPitchDifference){
+                removeAbility();
+                return;
+            }
+        }
        if (!allowDifferentSlots) {
             if (!bPlayer.getBoundAbilityName().equalsIgnoreCase(getName())) {
                 removeAbility();
@@ -106,7 +132,9 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
                 return;
             }
         }
-
+        if(slownessEnabled) {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 5, slownessPotency, false, false));
+        }
         for (Entity entity : GeneralMethods.getEntitiesAroundPoint(location, radius)) {
             if (entity instanceof LivingEntity && entity != player) {
                 if (Math.round((float) damageInterval / 50) == 0) {
