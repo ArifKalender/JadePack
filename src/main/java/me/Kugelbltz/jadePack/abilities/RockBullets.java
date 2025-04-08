@@ -35,9 +35,9 @@ public class RockBullets extends EarthAbility implements AddonAbility {
     private long throwInterval;
     @Attribute(Attribute.DURATION)
     private long duration;
-    private Location abilLoc;
-    int i=0;
+    boolean allowDifferentSlots;
     long throwInternalChangeable;
+    Location target;
 
     public RockBullets(Player player) {
         super(player);
@@ -56,6 +56,7 @@ public class RockBullets extends EarthAbility implements AddonAbility {
         cooldown = plugin.getConfig().getLong("Abilities.RockBullets.Cooldown");
         throwInterval = plugin.getConfig().getLong("Abilities.RockBullets.Interval");
         duration = plugin.getConfig().getLong("Abilities.RockBullets.Duration");
+        allowDifferentSlots = plugin.getConfig().getBoolean("Abilities.RockBullets.RemovalPolicy.AllowDifferentSlots");
     }
 
     private void throwRocks() {
@@ -115,11 +116,21 @@ public class RockBullets extends EarthAbility implements AddonAbility {
 
     @Override
     public void progress() {
-        if (!player.isOnline() || player.isDead() || !bPlayer.canBend(this) || this.getStartTime() + duration < System.currentTimeMillis()) {
+        if (!player.isOnline() || player.isDead() || !bPlayer.canBendIgnoreBinds(this) || this.getStartTime() + duration < System.currentTimeMillis()) {
             remove();
             bPlayer.addCooldown(this);
             return;
         }
+
+        if(!allowDifferentSlots){
+            if(!bPlayer.getBoundAbilityName().equalsIgnoreCase("RockBullets")){
+                remove();
+                bPlayer.addCooldown(this);
+                return;
+            }
+        }
+
+
         Location target = player.getEyeLocation();
 
         for(int i=0;i<=range;i++){
@@ -183,7 +194,7 @@ public class RockBullets extends EarthAbility implements AddonAbility {
 
     @Override
     public Location getLocation() {
-        return abilLoc;
+        return target;
     }
 
     @Override

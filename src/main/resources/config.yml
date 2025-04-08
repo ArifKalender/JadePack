@@ -3,7 +3,7 @@ Abilities:
     Enabled: true
     Cooldown: 8000
     Duration: 5000
-    Radius: 3.5
+    Radius: 5.5
     DamageInterval: 650
     Damage: 1.0
     Slowness:
@@ -14,13 +14,14 @@ Abilities:
       AllowDifferentSlots: false
       UserMustBeInRadius: true
       EnforceGroundDirection: true
-      MaximumPitchDifference: 45.0
+      MaxPitchDifference: 45.0
   RockBullets:
     Enabled: true
     Cooldown: 12000
     Duration: 3000
     Interval: 333
     Damage: 1.0
+    Range: 15
     RemovalPolicy:
       AllowDifferentSlots: false
 Strings:
@@ -28,5 +29,5 @@ Strings:
     Description: 'EarthQuake lets the user shake the earth beneath them in a set radius, damaging the entities inside.'
     Instructions: 'Right click on a block while sneaking.'
   RockBullets:
-    Description: ''
-    Instructions: ''
+    Description: 'Allows the user to fire rocks rapidly towards entities, dealing damage.'
+    Instructions: 'Left click while sneaking, requires an earthbendable towards the right side of the player.'
