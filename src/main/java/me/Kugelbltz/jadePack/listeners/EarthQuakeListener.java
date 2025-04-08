@@ -1,6 +1,7 @@
 package me.Kugelbltz.jadePack.listeners;
 
 import com.projectkorra.projectkorra.BendingPlayer;
+import com.projectkorra.projectkorra.util.ParticleEffect;
 import me.Kugelbltz.jadePack.abilities.EarthQuake;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

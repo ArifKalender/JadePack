@@ -21,6 +21,8 @@ Abilities:
     Duration: 3000
     Interval: 333
     Damage: 1.0
+    RemovalPolicy:
+      AllowDifferentSlots: false
 Strings:
   EarthQuake:
     Description: 'EarthQuake lets the user shake the earth beneath them in a set radius, damaging the entities inside.'

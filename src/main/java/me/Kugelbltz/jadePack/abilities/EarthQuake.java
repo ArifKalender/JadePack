@@ -17,6 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Random;
+import java.util.UUID;
 
 import static me.Kugelbltz.jadePack.JadePack.plugin;
 import static me.Kugelbltz.jadePack.JadePack.earthQuakeDescription;
@@ -203,7 +204,13 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
 
     @Override
     public String getAuthor() {
-        return "Kugelbltz";
+
+        if(plugin.getServer().getOnlineMode()){
+            return Bukkit.getPlayer(UUID.fromString("606e8422-e4b9-4921-a673-ca85ffb35be6")).getName();
+        }else{
+            return "Kugelbltz";
+        }
+
     }
 
     @Override

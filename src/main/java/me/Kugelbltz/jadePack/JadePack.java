@@ -3,6 +3,7 @@ package me.Kugelbltz.jadePack;
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import me.Kugelbltz.jadePack.listeners.EarthQuakeListener;
 import me.Kugelbltz.jadePack.listeners.PKReloadEvent;
+import me.Kugelbltz.jadePack.listeners.RockBulletsListener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -26,6 +27,7 @@ public final class JadePack extends JavaPlugin {
 
     private void registerListeners(){
         plugin.getServer().getPluginManager().registerEvents(new EarthQuakeListener(), this);
+        plugin.getServer().getPluginManager().registerEvents(new RockBulletsListener(), this);
         plugin.getServer().getPluginManager().registerEvents(new PKReloadEvent(), this);
     }
     public static void setFields(){
