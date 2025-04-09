@@ -7,15 +7,25 @@ import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.ability.util.ComboManager;
 import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.util.ClickType;
+import com.projectkorra.projectkorra.util.DamageHandler;
+import com.projectkorra.projectkorra.util.TempBlock;
+import com.projectkorra.projectkorra.util.TempFallingBlock;
 import me.Kugelbltz.jadePack.JadePack;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static me.Kugelbltz.jadePack.JadePack.plugin;
 
@@ -42,18 +52,18 @@ public class CrustShatter extends EarthAbility implements AddonAbility, ComboAbi
 
     public CrustShatter(Player player) {
         super(player);
-        if(bPlayer.canBendIgnoreBinds(this) && ! hasAbility(player,CrustShatter.class)){
+        if (bPlayer.canBendIgnoreBinds(this) && !hasAbility(player, CrustShatter.class)) {
             setFields();
             dir = player.getEyeLocation().getDirection().setY(0).normalize();
             start();
         }
     }
 
-    private void setFields(){
+    private void setFields() {
         cooldown = plugin.getConfig().getLong("Abilities.CrustShatter.Cooldown");
         damage = plugin.getConfig().getDouble("Abilities.CrustShatter.Damage");
         range = plugin.getConfig().getDouble("Abilities.CrustShatter.Range");
-        widthIncrement = plugin.getConfig().getInt("Abilities.CrustShatter.WidthIncrement");
+        widthIncrement = (float) plugin.getConfig().getDouble("Abilities.CrustShatter.WidthIncrement");
         fallingBlocks = plugin.getConfig().getBoolean("Abilities.CrustShatter.FallingBlocks");
         arrowVisual = plugin.getConfig().getBoolean("Abilities.CrustShatter.ArrowVisual");
         charge = plugin.getConfig().getLong("Abilities.CrustShatter.Charge");
@@ -76,7 +86,7 @@ public class CrustShatter extends EarthAbility implements AddonAbility, ComboAbi
         return plugin.getConfig().getString("Strings.CrustShatter.Description");
     }
 
-    private void drawLine(Location location1, Location location2,int slowness) {
+    private void drawLine(Location location1, Location location2, int slowness) {
         new BukkitRunnable() {
             private final double distance = location1.distance(location2);
             private final int points = (int) (distance * 10);
@@ -88,6 +98,7 @@ public class CrustShatter extends EarthAbility implements AddonAbility, ComboAbi
 
             @Override
             public void run() {
+
                 if (count >= points) {
                     this.cancel();
                     return;
@@ -99,52 +110,94 @@ public class CrustShatter extends EarthAbility implements AddonAbility, ComboAbi
             }
         }.runTaskTimer(plugin, 0, slowness);
     }
-    private void drawArrow(){
+
+    private void drawArrow() {
         Location arrowTop, arrowBottom, arrowLeft, arrowRight;
 
-        arrowTop = player.getEyeLocation().add(dir.clone().multiply(3)).add(0,1,0);
+        arrowTop = player.getEyeLocation().add(dir.clone().multiply(3)).add(0, 1, 0);
         arrowBottom = player.getLocation().add(dir.clone().multiply(3));
-        arrowLeft = GeneralMethods.getLeftSide(arrowTop.clone().add(0,-1,0), 0.5);
-        arrowRight = GeneralMethods.getRightSide(arrowTop.clone().add(0,-1,0), 0.5);
+        arrowLeft = GeneralMethods.getLeftSide(arrowTop.clone().add(0, -1, 0), 0.5);
+        arrowRight = GeneralMethods.getRightSide(arrowTop.clone().add(0, -1, 0), 0.5);
 
-        drawLine(arrowTop, arrowBottom,1);
-        drawLine(arrowLeft, arrowBottom,2);
-        drawLine(arrowRight, arrowBottom,2);
+        drawLine(arrowTop, arrowBottom, 1);
+        drawLine(arrowLeft, arrowBottom, 2);
+        drawLine(arrowRight, arrowBottom, 2);
 
-        player.setVelocity(new Vector(0,0,0));
+        player.setVelocity(new Vector(0, 0, 0));
     }
 
-    List<Location> toRemove = new ArrayList<>();
-    private void shatterGround(){
-        Location temp = player.getLocation().clone();
-        for(int i=0;i<=range;i++){
+    List<Entity> alreadyDamaged = new ArrayList<>();
+    List<Block> toRemove = new ArrayList<>();
+
+    private void shatterGround() {
+        player.getWorld().playSound(player.getLocation(), Sound.ITEM_MACE_SMASH_GROUND_HEAVY, 2, 0);
+        Location temp = player.getLocation().clone().add(0, -0.5, 0);
+        for (int i = 0; i <= range; i++) {
             temp.add(dir.clone().normalize());
-            toRemove.add(temp.clone());
-            increasingWidth+=widthIncrement;
-            /*
-            * Burada kaldın. Sola ve sağa doğru ilerleyen temp lokasyonlarını toRemove listesine ekle.
-            * Ekleyecek blok kalmadığında toRemove listesindeki her bloğu AIR tempblokları ile doldur,
-            * tempblocklar configurable bir süre boyunca AIR olarak kalsın. Fallingblock true değilse
-            * fallingblock visuallarını gösterme, aksi taktirde göster.
-            *
-            * */
+            toRemove.add(temp.getBlock());
+            increasingWidth += widthIncrement;
+            for (float j = 0; j <= increasingWidth; j += 0.1f) {
+                toRemove.add(GeneralMethods.getLeftSide(temp, j).getBlock());
+                toRemove.add(GeneralMethods.getRightSide(temp, j).getBlock());
+            }
         }
+        for (Block block : toRemove) {
+            if (this.isEarthbendable(block.getLocation().add(0, 1, 0).getBlock())) {
+                BlockData data = block.getLocation().add(0, 1, 0).getBlock().getBlockData();
+                new TempBlock(block.getLocation().add(0, 1, 0).getBlock(), Material.AIR.createBlockData(), 6000, this);
+                if(fallingBlocks){
+                    new TempFallingBlock(block.getLocation().add(0,1,0),data,new Vector(new Random().nextDouble(), Math.abs(new Random().nextDouble()), new Random().nextDouble()).multiply(0.6),this);
+                }
+            }
+            if (this.isEarthbendable(block.getLocation().add(0, 2, 0).getBlock())) {
+                BlockData data = block.getLocation().add(0, 2, 0).getBlock().getBlockData();
+                new TempBlock(block.getLocation().add(0, 2, 0).getBlock(), Material.AIR.createBlockData(), 6000, this);
+                if (fallingBlocks) {
+                    new TempFallingBlock(block.getLocation().add(0, 2, 0), data, new Vector(new Random().nextDouble(), Math.abs(new Random().nextDouble()), new Random().nextDouble()).multiply(0.6), this);
+                }
+
+            }
+
+            if (this.isEarthbendable(block)) {
+                BlockData data = block.getBlockData();
+
+                new TempBlock(block, Material.AIR.createBlockData(), 6000, this);
+                if(fallingBlocks){
+                    new TempFallingBlock(block.getLocation(),data,new Vector(new Random().nextDouble(), Math.abs(new Random().nextDouble()), new Random().nextDouble()).multiply(0.6),this);
+                }
+
+                for (Entity entity : GeneralMethods.getEntitiesAroundPoint(block.getLocation(), 1)) {
+                    if (entity instanceof LivingEntity) {
+                        if (!alreadyDamaged.contains(entity)) {
+                            entity.setVelocity(new Vector(new Random().nextDouble(), Math.abs(new Random().nextDouble()), new Random().nextDouble()));
+                            DamageHandler.damageEntity(entity, damage, this);
+                            alreadyDamaged.add(entity);
+                        }
+
+                    }
+                }
+            }
+        }
+
     }
 
     @Override
     public void progress() {
 
-        if(getStartTime() + charge > System.currentTimeMillis()){
-            player.setVelocity(new Vector(0,0,0));
+        if (getStartTime() + 1400 > System.currentTimeMillis()) {
+            player.setVelocity(new Vector(0, 0, 0));
             Location loc = player.getLocation().add(dir.clone().multiply(3));
-            loc.getWorld().spawnParticle(Particle.ENCHANTED_HIT,loc,1,0,0,0,0);
+            loc.getWorld().spawnParticle(Particle.ENCHANTED_HIT, loc, 1, 0, 0, 0, 0);
 
-            if(arrowVisual){
+            if (arrowVisual) {
                 drawArrow();
-                arrowVisual=false;
+                arrowVisual = false;
             }
         } else {
-
+            shatterGround();
+            remove();
+            bPlayer.addCooldown(this);
+            return;
         }
 
     }
