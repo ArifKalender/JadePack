@@ -17,6 +17,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -24,6 +25,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -116,8 +118,8 @@ public class CrustShatter extends EarthAbility implements AddonAbility, ComboAbi
 
         arrowTop = player.getEyeLocation().add(dir.clone().multiply(3)).add(0, 1, 0);
         arrowBottom = player.getLocation().add(dir.clone().multiply(3));
-        arrowLeft = GeneralMethods.getLeftSide(arrowTop.clone().add(0, -1, 0), 0.5);
-        arrowRight = GeneralMethods.getRightSide(arrowTop.clone().add(0, -1, 0), 0.5);
+        arrowLeft = GeneralMethods.getLeftSide(arrowTop.clone().add(0, -1.2, 0), 0.6);
+        arrowRight = GeneralMethods.getRightSide(arrowTop.clone().add(0, -1.2, 0), 0.6);
 
         drawLine(arrowTop, arrowBottom, 1);
         drawLine(arrowLeft, arrowBottom, 2);
@@ -126,7 +128,6 @@ public class CrustShatter extends EarthAbility implements AddonAbility, ComboAbi
         player.setVelocity(new Vector(0, 0, 0));
     }
 
-    List<Entity> alreadyDamaged = new ArrayList<>();
     List<Block> toRemove = new ArrayList<>();
 
     private void shatterGround() {
@@ -145,8 +146,8 @@ public class CrustShatter extends EarthAbility implements AddonAbility, ComboAbi
             if (this.isEarthbendable(block.getLocation().add(0, 1, 0).getBlock())) {
                 BlockData data = block.getLocation().add(0, 1, 0).getBlock().getBlockData();
                 new TempBlock(block.getLocation().add(0, 1, 0).getBlock(), Material.AIR.createBlockData(), 6000, this);
-                if(fallingBlocks){
-                    new TempFallingBlock(block.getLocation().add(0,1,0),data,new Vector(new Random().nextDouble(), Math.abs(new Random().nextDouble()), new Random().nextDouble()).multiply(0.6),this);
+                if (fallingBlocks) {
+                    new TempFallingBlock(block.getLocation().add(0, 1, 0), data, new Vector(new Random().nextDouble(), Math.abs(new Random().nextDouble()), new Random().nextDouble()).multiply(0.6), this);
                 }
             }
             if (this.isEarthbendable(block.getLocation().add(0, 2, 0).getBlock())) {
@@ -162,19 +163,14 @@ public class CrustShatter extends EarthAbility implements AddonAbility, ComboAbi
                 BlockData data = block.getBlockData();
 
                 new TempBlock(block, Material.AIR.createBlockData(), 6000, this);
-                if(fallingBlocks){
-                    new TempFallingBlock(block.getLocation(),data,new Vector(new Random().nextDouble(), Math.abs(new Random().nextDouble()), new Random().nextDouble()).multiply(0.6),this);
+                if (fallingBlocks) {
+                    new TempFallingBlock(block.getLocation(), data, new Vector(new Random().nextDouble(), Math.abs(new Random().nextDouble()), new Random().nextDouble()).multiply(0.6), this);
                 }
 
                 for (Entity entity : GeneralMethods.getEntitiesAroundPoint(block.getLocation(), 1)) {
-                    if (entity instanceof LivingEntity) {
-                        if (!alreadyDamaged.contains(entity)) {
-                            entity.setVelocity(new Vector(new Random().nextDouble(), Math.abs(new Random().nextDouble()), new Random().nextDouble()));
-                            DamageHandler.damageEntity(entity, damage, this);
-                            alreadyDamaged.add(entity);
-                        }
-
-                    }
+                    player.sendMessage("entity");
+                    entity.setVelocity(new Vector(new Random().nextDouble(), Math.abs(new Random().nextDouble()), new Random().nextDouble()));
+                    DamageHandler.damageEntity(entity, damage, this);
                 }
             }
         }
