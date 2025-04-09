@@ -24,6 +24,15 @@ Abilities:
     Range: 15
     RemovalPolicy:
       AllowDifferentSlots: false
+  CrustShatter:
+    Enabled: true
+    Cooldown: 14000
+    Charge: 500
+    Damage: 3
+    Range: 8
+    FallingBlocks: true
+    ArrowVisual: true
+    WidthIncrement: 0.25
   RockLike:
     Enabled: true
 Strings:
@@ -33,5 +42,8 @@ Strings:
   RockBullets:
     Description: 'Allows the user to fire rocks rapidly towards entities, dealing damage.'
     Instructions: 'Left click while sneaking, requires an earthbendable towards the right side of the player.'
+  CrustShatter:
+    Description: 'This ability allows the user to smash the ground, shaking it and damaging the enemies in front inside a cone shape.'
+    Instructions: 'EarthQuake (Hold sneak) > Shockwave (Left click) > Shockwave (Release sneak) > EarthSmash (Tap sneak)'
   RockLike:
     Description: 'This passive makes the user is immune to knockback caused by other attackers if theyre sneaking.'

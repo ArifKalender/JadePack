@@ -85,6 +85,7 @@ public class RockBullets extends EarthAbility implements AddonAbility {
             if (!RegionProtection.isRegionProtected(this, rockStart)) {
                 Material mat = rockStart.getBlock().getType();
                 new TempBlock(rockStart.getBlock(), Material.AIR.createBlockData(), 3000, this);
+
                 FallingBlock fB = GeneralMethods.spawnFallingBlock(rockStart, mat, mat.createBlockData());
                 fB.getWorld().spawnParticle(Particle.BLOCK_CRUMBLE,fB.getLocation(),10,1,1,1,0,mat.createBlockData());
                 fB.setVelocity(new Vector(0, 0.66, 0));
