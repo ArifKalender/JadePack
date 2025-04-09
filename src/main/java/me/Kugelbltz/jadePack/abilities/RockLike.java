@@ -59,6 +59,11 @@ public class RockLike extends EarthAbility implements AddonAbility, PassiveAbili
     }
 
     @Override
+    public boolean isEnabled() {
+        return JadePack.plugin.getConfig().getBoolean("Abilities.RockLike.Enabled");
+    }
+
+    @Override
     public String getDescription() {
         return JadePack.plugin.getConfig().getString("Strings.RockLike.Description");
     }

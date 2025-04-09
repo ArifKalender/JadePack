@@ -11,7 +11,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 public class EarthQuakeListener implements Listener {
     @EventHandler
     private void onRightClick(PlayerInteractEvent event){
-        if(event.getAction()== Action.RIGHT_CLICK_BLOCK){
+        if(event.getAction()== Action.LEFT_CLICK_BLOCK){
             BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(event.getPlayer());
             if(bPlayer.getBoundAbilityName().equalsIgnoreCase("EarthQuake")){
                 if(event.getPlayer().isSneaking()){

@@ -29,7 +29,7 @@ Abilities:
 Strings:
   EarthQuake:
     Description: 'EarthQuake lets the user shake the earth beneath them in a set radius, damaging the entities inside.'
-    Instructions: 'Right click on a block while sneaking.'
+    Instructions: 'Left click on a block while sneaking.'
   RockBullets:
     Description: 'Allows the user to fire rocks rapidly towards entities, dealing damage.'
     Instructions: 'Left click while sneaking, requires an earthbendable towards the right side of the player.'
