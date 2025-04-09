@@ -20,8 +20,6 @@ import java.util.Random;
 import java.util.UUID;
 
 import static me.Kugelbltz.jadePack.JadePack.plugin;
-import static me.Kugelbltz.jadePack.JadePack.earthQuakeDescription;
-import static me.Kugelbltz.jadePack.JadePack.earthQuakeInstructions;
 
 public class EarthQuake extends EarthAbility implements AddonAbility {
 
@@ -90,12 +88,12 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
 
     @Override
     public String getDescription() {
-        return earthQuakeDescription;
+        return plugin.getConfig().getString("Strings.EarthQuake.Description");
     }
 
     @Override
     public String getInstructions() {
-        return earthQuakeInstructions;
+        return plugin.getConfig().getString("Strings.EarthQuake.Instructions");
     }
 
     private void removeAbility() {
@@ -204,12 +202,7 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
 
     @Override
     public String getAuthor() {
-
-        if(plugin.getServer().getOnlineMode()){
-            return Bukkit.getPlayer(UUID.fromString("606e8422-e4b9-4921-a673-ca85ffb35be6")).getName();
-        }else{
-            return "Kugelbltz";
-        }
+        return JadePack.getAuthor();
 
     }
 

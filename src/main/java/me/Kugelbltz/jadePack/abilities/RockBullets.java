@@ -209,11 +209,7 @@ public class RockBullets extends EarthAbility implements AddonAbility {
 
     @Override
     public String getAuthor() {
-        if (plugin.getServer().getOnlineMode()) {
-            return Bukkit.getPlayer(UUID.fromString("606e8422-e4b9-4921-a673-ca85ffb35be6")).getName();
-        } else {
-            return "Kugelbltz";
-        }
+        return JadePack.getAuthor();
     }
 
     @Override
