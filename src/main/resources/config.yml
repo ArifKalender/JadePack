@@ -35,6 +35,9 @@ Abilities:
     WidthIncrement: 0.25
   RockLike:
     Enabled: true
+  EarthSlide:
+    Enabled: true
+    Speed: 0.6
 Strings:
   EarthQuake:
     Description: 'EarthQuake lets the user shake the earth beneath them in a set radius, damaging the entities inside.'
@@ -47,3 +50,5 @@ Strings:
     Instructions: 'EarthQuake (Hold sneak) > Shockwave (Left click) > Shockwave (Release sneak) > EarthSmash (Tap sneak)'
   RockLike:
     Description: 'This passive makes the user is immune to knockback caused by other attackers if theyre sneaking.'
+  EarthSlide:
+    Description: 'This passive lets the user slide while using EarthArmor'

@@ -1,10 +1,7 @@
 package me.Kugelbltz.jadePack;
 
 import com.projectkorra.projectkorra.ability.CoreAbility;
-import me.Kugelbltz.jadePack.listeners.EarthQuakeListener;
-import me.Kugelbltz.jadePack.listeners.PKReloadEvent;
-import me.Kugelbltz.jadePack.listeners.RockBulletsListener;
-import me.Kugelbltz.jadePack.listeners.RockLikeListener;
+import me.Kugelbltz.jadePack.listeners.*;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,17 +22,14 @@ public final class JadePack extends JavaPlugin {
     }
 
     public static String getAuthor(){
-        if(plugin.getServer().getOnlineMode()){
-            return Bukkit.getPlayer(UUID.fromString("606e8422-e4b9-4921-a673-ca85ffb35be6")).getName();
-        }else{
-            return "Kugelbltz";
-        }
+        return "Kugelbltz";
     }
     private void registerListeners(){
         plugin.getServer().getPluginManager().registerEvents(new EarthQuakeListener(), this);
         plugin.getServer().getPluginManager().registerEvents(new RockBulletsListener(), this);
         plugin.getServer().getPluginManager().registerEvents(new PKReloadEvent(), this);
         plugin.getServer().getPluginManager().registerEvents(new RockLikeListener(), this);
+        plugin.getServer().getPluginManager().registerEvents(new EarthSlideListener(), this);
     }
 
 
