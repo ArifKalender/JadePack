@@ -17,15 +17,12 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -42,22 +39,22 @@ public class CrustShatter extends EarthAbility implements AddonAbility, ComboAbi
     @Attribute("WidthIncrement")
     private float widthIncrement;
     @Attribute(Attribute.CHARGE_DURATION)
-    private long charge;
     private boolean fallingBlocks;
-    private boolean arrowVisual;
     Vector dir;
-
-    private boolean canStart;
     private float increasingWidth;
-    private Location location;
-
+    Location loc;
+    long charge;
 
     public CrustShatter(Player player) {
         super(player);
         if (bPlayer.canBendIgnoreBinds(this) && !hasAbility(player, CrustShatter.class)) {
-            setFields();
-            dir = player.getEyeLocation().getDirection().setY(0).normalize();
-            start();
+            if (this.isEarthbendable(player.getLocation().add(0, -0.1, 0).getBlock())) {
+                setFields();
+                dir = player.getEyeLocation().getDirection().setY(0).normalize();
+                loc = player.getLocation().add(player.getLocation().getDirection().normalize());
+                loc.add(0,0.5,0);
+                start();
+            }
         }
     }
 
@@ -67,10 +64,8 @@ public class CrustShatter extends EarthAbility implements AddonAbility, ComboAbi
         range = plugin.getConfig().getDouble("Abilities.CrustShatter.Range");
         widthIncrement = (float) plugin.getConfig().getDouble("Abilities.CrustShatter.WidthIncrement");
         fallingBlocks = plugin.getConfig().getBoolean("Abilities.CrustShatter.FallingBlocks");
-        arrowVisual = plugin.getConfig().getBoolean("Abilities.CrustShatter.ArrowVisual");
         charge = plugin.getConfig().getLong("Abilities.CrustShatter.Charge");
 
-        canStart = false;
     }
 
     @Override
@@ -88,47 +83,8 @@ public class CrustShatter extends EarthAbility implements AddonAbility, ComboAbi
         return plugin.getConfig().getString("Strings.CrustShatter.Description");
     }
 
-    private void drawLine(Location location1, Location location2, int slowness) {
-        new BukkitRunnable() {
-            private final double distance = location1.distance(location2);
-            private final int points = (int) (distance * 10);
-            private final Location current = location1.clone();
-            private final double stepX = (location2.getX() - location1.getX()) / points;
-            private final double stepY = (location2.getY() - location1.getY()) / points;
-            private final double stepZ = (location2.getZ() - location1.getZ()) / points;
-            private int count = 0;
-
-            @Override
-            public void run() {
-
-                if (count >= points) {
-                    this.cancel();
-                    return;
-                }
-
-                current.add(stepX, stepY, stepZ);
-                current.getWorld().spawnParticle(Particle.CRIT, current, 1, 0, 0, 0, 0);
-                count++;
-            }
-        }.runTaskTimer(plugin, 0, slowness);
-    }
-
-    private void drawArrow() {
-        Location arrowTop, arrowBottom, arrowLeft, arrowRight;
-
-        arrowTop = player.getEyeLocation().add(dir.clone().multiply(3)).add(0, 1, 0);
-        arrowBottom = player.getLocation().add(dir.clone().multiply(3));
-        arrowLeft = GeneralMethods.getLeftSide(arrowTop.clone().add(0, -1.2, 0), 0.6);
-        arrowRight = GeneralMethods.getRightSide(arrowTop.clone().add(0, -1.2, 0), 0.6);
-
-        drawLine(arrowTop, arrowBottom, 1);
-        drawLine(arrowLeft, arrowBottom, 2);
-        drawLine(arrowRight, arrowBottom, 2);
-
-        player.setVelocity(new Vector(0, 0, 0));
-    }
-
     List<Block> toRemove = new ArrayList<>();
+    List<Entity> damaged = new ArrayList<>();
 
     private void shatterGround() {
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_MACE_SMASH_GROUND_HEAVY, 2, 0);
@@ -149,6 +105,7 @@ public class CrustShatter extends EarthAbility implements AddonAbility, ComboAbi
                 if (fallingBlocks) {
                     new TempFallingBlock(block.getLocation().add(0, 1, 0), data, new Vector(new Random().nextDouble(), Math.abs(new Random().nextDouble()), new Random().nextDouble()).multiply(0.6), this);
                 }
+                block.getWorld().spawnParticle(Particle.EXPLOSION,block.getLocation().add(0,1,0),1,1,1,1,0);
             }
             if (this.isEarthbendable(block.getLocation().add(0, 2, 0).getBlock())) {
                 BlockData data = block.getLocation().add(0, 2, 0).getBlock().getBlockData();
@@ -156,21 +113,26 @@ public class CrustShatter extends EarthAbility implements AddonAbility, ComboAbi
                 if (fallingBlocks) {
                     new TempFallingBlock(block.getLocation().add(0, 2, 0), data, new Vector(new Random().nextDouble(), Math.abs(new Random().nextDouble()), new Random().nextDouble()).multiply(0.6), this);
                 }
+                block.getWorld().spawnParticle(Particle.EXPLOSION,block.getLocation().add(0,2,0),1,1,1,1,0);
 
             }
 
             if (this.isEarthbendable(block)) {
                 BlockData data = block.getBlockData();
 
+                block.getWorld().spawnParticle(Particle.EXPLOSION,block.getLocation(),1,1,1,1,0);
                 new TempBlock(block, Material.AIR.createBlockData(), 6000, this);
                 if (fallingBlocks) {
                     new TempFallingBlock(block.getLocation(), data, new Vector(new Random().nextDouble(), Math.abs(new Random().nextDouble()), new Random().nextDouble()).multiply(0.6), this);
                 }
 
-                for (Entity entity : GeneralMethods.getEntitiesAroundPoint(block.getLocation(), 1)) {
-                    player.sendMessage("entity");
-                    entity.setVelocity(new Vector(new Random().nextDouble(), Math.abs(new Random().nextDouble()), new Random().nextDouble()));
-                    DamageHandler.damageEntity(entity, damage, this);
+                for (Entity entity : GeneralMethods.getEntitiesAroundPoint(block.getLocation(), 1.5)) {
+                    if (entity instanceof LivingEntity && entity != player && !damaged.contains(entity)) {
+                        DamageHandler.damageEntity(entity, damage, this);
+                        entity.setVelocity(new Vector(new Random().nextDouble(), 1, new Random().nextDouble()));
+                        damaged.add(entity);
+                    }
+
                 }
             }
         }
@@ -180,15 +142,9 @@ public class CrustShatter extends EarthAbility implements AddonAbility, ComboAbi
     @Override
     public void progress() {
 
-        if (getStartTime() + 1400 > System.currentTimeMillis()) {
+        if (getStartTime() + charge > System.currentTimeMillis()) {
             player.setVelocity(new Vector(0, 0, 0));
-            Location loc = player.getLocation().add(dir.clone().multiply(3));
-            loc.getWorld().spawnParticle(Particle.ENCHANTED_HIT, loc, 1, 0, 0, 0, 0);
-
-            if (arrowVisual) {
-                drawArrow();
-                arrowVisual = false;
-            }
+            loc.getWorld().spawnParticle(Particle.SMOKE,loc,4,0,0.1,0,0);
         } else {
             shatterGround();
             remove();
@@ -220,7 +176,7 @@ public class CrustShatter extends EarthAbility implements AddonAbility, ComboAbi
 
     @Override
     public Location getLocation() {
-        return location;
+        return null;
     }
 
     @Override

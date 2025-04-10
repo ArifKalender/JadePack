@@ -102,9 +102,8 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
     }
 
 
-    @Override
-    public void progress() {
-        i++;
+    private void removeLogic(){
+
         if (!bPlayer.canBendIgnoreBinds(this) || player.isDead() || !player.isOnline() || getStartTime() + duration < System.currentTimeMillis()) {
             removeAbility();
             return;
@@ -119,7 +118,7 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
                 return;
             }
         }
-       if (!allowDifferentSlots) {
+        if (!allowDifferentSlots) {
             if (!bPlayer.getBoundAbilityName().equalsIgnoreCase(getName())) {
                 removeAbility();
                 return;
@@ -131,6 +130,12 @@ public class EarthQuake extends EarthAbility implements AddonAbility {
                 return;
             }
         }
+    }
+
+    @Override
+    public void progress() {
+        i++;
+        removeLogic();
         if(slownessEnabled) {
             player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 5, slownessPotency, false, false));
         }

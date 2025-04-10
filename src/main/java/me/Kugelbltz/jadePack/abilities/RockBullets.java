@@ -153,7 +153,6 @@ public class RockBullets extends EarthAbility implements AddonAbility {
         }else{
             throwInternalChangeable-=50;
         }
-        //player.setVelocity(player.getEyeLocation().getDirection().setY(-1).multiply(0.6));
 
     }
 

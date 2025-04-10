@@ -27,7 +27,7 @@ Abilities:
   CrustShatter:
     Enabled: true
     Cooldown: 14000
-    Charge: 500
+    Charge: 250
     Damage: 3
     Range: 8
     FallingBlocks: true
