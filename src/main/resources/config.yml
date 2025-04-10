@@ -37,7 +37,7 @@ Abilities:
     Enabled: true
   EarthSlide:
     Enabled: true
-    Speed: 0.6
+    Speed: 0.45
 Strings:
   EarthQuake:
     Description: 'EarthQuake lets the user shake the earth beneath them in a set radius, damaging the entities inside.'
