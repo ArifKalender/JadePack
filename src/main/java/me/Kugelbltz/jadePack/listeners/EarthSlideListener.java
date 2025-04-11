@@ -23,31 +23,33 @@ public class EarthSlideListener implements Listener {
     private void onSneak(PlayerToggleSneakEvent event){
         if(event.isSneaking()){
             Player player = event.getPlayer();
-            if(CoreAbility.hasAbility(player, EarthArmor.class)){
-                float speed = (float) plugin.getConfig().getDouble("Abilities.EarthSlide.Speed");
-                double step_height = player.getAttribute(Attribute.STEP_HEIGHT).getBaseValue();
-                new BukkitRunnable(){
-                    @Override
-                    public void run() {
-                        player.getAttribute(Attribute.STEP_HEIGHT).setBaseValue(1);
+            if(player.hasPermission("bending.ability.earthslide")) {
+                if (CoreAbility.hasAbility(player, EarthArmor.class)) {
+                    float speed = (float) plugin.getConfig().getDouble("Abilities.EarthSlide.Speed");
+                    double step_height = player.getAttribute(Attribute.STEP_HEIGHT).getBaseValue();
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            player.getAttribute(Attribute.STEP_HEIGHT).setBaseValue(1);
 
 
-                        if(!player.isOnline() || player.isDead()){
-                            player.getAttribute(Attribute.STEP_HEIGHT).setBaseValue(step_height);
-                            this.cancel();
-                        }
-                        if(!player.isSneaking() || !CoreAbility.hasAbility(player, EarthArmor.class) ){
-                            player.getAttribute(Attribute.STEP_HEIGHT).setBaseValue(step_height);
-                            this.cancel();
-                        }
+                            if (!player.isOnline() || player.isDead()) {
+                                player.getAttribute(Attribute.STEP_HEIGHT).setBaseValue(step_height);
+                                this.cancel();
+                            }
+                            if (!player.isSneaking() || !CoreAbility.hasAbility(player, EarthArmor.class)) {
+                                player.getAttribute(Attribute.STEP_HEIGHT).setBaseValue(step_height);
+                                this.cancel();
+                            }
 
-                        if(returnBendable(player) && BendingPlayer.getBendingPlayer(player).getBoundAbilityName().equalsIgnoreCase("EarthArmor")){
-                            Vector vector = player.getEyeLocation().getDirection();
-                            vector.setY(-1);
-                            player.setVelocity(vector.normalize().multiply(speed));
+                            if (returnBendable(player) && BendingPlayer.getBendingPlayer(player).getBoundAbilityName().equalsIgnoreCase("EarthArmor")) {
+                                Vector vector = player.getEyeLocation().getDirection();
+                                vector.setY(-1);
+                                player.setVelocity(vector.normalize().multiply(speed));
+                            }
                         }
-                    }
-                }.runTaskTimer(plugin,0,1);
+                    }.runTaskTimer(plugin, 0, 1);
+                }
             }
         }
     }

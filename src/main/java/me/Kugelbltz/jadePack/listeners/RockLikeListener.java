@@ -22,16 +22,17 @@ public class RockLikeListener implements Listener {
     private void onKb(EntityKnockbackByEntityEvent event) {
         Entity entity = event.getEntity();
         if (entity instanceof Player) {
-            if (((Player) entity).isSneaking()) {
-                if (EarthAbility.isEarthbendable((Player) entity, new Location(entity.getWorld(), entity.getLocation().getX(), entity.getLocation().getY() - 1, entity.getLocation().getZ()).getBlock())) {
-                    if (entity.hasPermission("bending.ability.rocklike")) {
-                        boolean isEnabled = plugin.getConfig().getBoolean("Abilities.RockLike.Enabled");
-                        if (isEnabled) {
-                            event.setCancelled(true);
+            if (entity.hasPermission("bending.ability.rocklike")) {
+                if (((Player) entity).isSneaking()) {
+                    if (EarthAbility.isEarthbendable((Player) entity, new Location(entity.getWorld(), entity.getLocation().getX(), entity.getLocation().getY() - 1, entity.getLocation().getZ()).getBlock())) {
+                        if (entity.hasPermission("bending.ability.rocklike")) {
+                            boolean isEnabled = plugin.getConfig().getBoolean("Abilities.RockLike.Enabled");
+                            if (isEnabled) {
+                                event.setCancelled(true);
+                            }
                         }
                     }
                 }
-
             }
         }
     }
@@ -56,7 +57,7 @@ public class RockLikeListener implements Listener {
 
 
                         if (EarthAbility.isEarthbendable(player, new Location(player.getWorld(), player.getLocation().getX(), player.getLocation().getY() - 0.1, player.getLocation().getZ()).getBlock())) {
-                            player.getWorld().spawnParticle(Particle.BLOCK_CRUMBLE, player.getLocation(), 9, 0.2, 0.2, 0.2, 0.05, player.getLocation().add(0,-1,0).getBlock().getType().createBlockData());
+                            player.getWorld().spawnParticle(Particle.BLOCK_CRUMBLE, player.getLocation(), 9, 0.2, 0.2, 0.2, 0.05, player.getLocation().add(0, -1, 0).getBlock().getType().createBlockData());
                         }
                     }
                 }.runTaskTimer(plugin, 0, 3);
