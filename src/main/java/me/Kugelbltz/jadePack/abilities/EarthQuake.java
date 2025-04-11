@@ -17,7 +17,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Random;
-import java.util.UUID;
 
 import static me.Kugelbltz.jadePack.JadePack.plugin;
 

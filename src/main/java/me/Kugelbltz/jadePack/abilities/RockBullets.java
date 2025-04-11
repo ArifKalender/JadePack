@@ -8,7 +8,6 @@ import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.region.RegionProtection;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.TempBlock;
-import com.projectkorra.projectkorra.util.TempFallingBlock;
 import me.Kugelbltz.jadePack.JadePack;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
@@ -18,8 +17,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.UUID;
 
 import static me.Kugelbltz.jadePack.JadePack.plugin;
 

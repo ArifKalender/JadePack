@@ -2,11 +2,9 @@ package me.Kugelbltz.jadePack;
 
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import me.Kugelbltz.jadePack.listeners.*;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.UUID;
 
 public final class JadePack extends JavaPlugin {
     public static Plugin plugin;

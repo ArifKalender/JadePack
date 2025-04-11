@@ -1,7 +1,6 @@
 package me.Kugelbltz.jadePack.abilities;
 
 import com.projectkorra.projectkorra.ability.*;
-import com.projectkorra.projectkorra.earthbending.EarthArmor;
 import me.Kugelbltz.jadePack.JadePack;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

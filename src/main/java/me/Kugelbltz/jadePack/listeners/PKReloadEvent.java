@@ -1,7 +1,6 @@
 package me.Kugelbltz.jadePack.listeners;
 
 import com.projectkorra.projectkorra.event.BendingReloadEvent;
-import me.Kugelbltz.jadePack.JadePack;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
